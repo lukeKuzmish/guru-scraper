@@ -28,6 +28,16 @@ class GuruScraperConfig {
         
     } // __construct
     
+    public function updatePreviousJobs() {
+        $jsonStr = json_encode($this->previousJobs);
+        if (!file_put_contents($this->previousJobsFile, $jsonStr)) {
+            throw new Exception('Could not update previous jobs file!');
+            return false;
+        }
+        return true;
+        
+    }
+    
     private function setPreviousJobs() {
         if (!file_exists($this->previousJobsFile)) {
             if (!file_put_contents($this->previousJobsFile, json_encode(array()))) {
@@ -38,9 +48,9 @@ class GuruScraperConfig {
             return true;
         }
         else {
-            $jsonStr = file_get_contents($this->previousJobsFile);
+            $jsonStr = trim(file_get_contents($this->previousJobsFile));
             $previousJobs = json_decode($jsonStr,true);
-            if ($previousJobs === null) {
+            if (($previousJobs === null) and ($jsonStr != '')) {
                 throw new Exception('Malformed previous jobs JSON!');
                 return false;
             }
